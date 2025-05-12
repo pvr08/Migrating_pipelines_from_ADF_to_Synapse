@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfactory-vam"
+		},
+		"AzureDataLakeStorage_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://adlsgvamshi.dfs.core.windows.net/"
+		},
+		"AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://kvaultvamshi.vault.azure.net/"
+		},
+		"AzureSqlDatabase_properties_typeProperties_server": {
+			"value": "sqlservervams.database.windows.net"
+		},
+		"AzureSqlDatabase_properties_typeProperties_database": {
+			"value": "sqldb"
+		},
+		"AzureSqlDatabase_properties_typeProperties_userName": {
+			"value": "admin25"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "sqlservervams.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "sqldb"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "admin25"
+		},
+		"FileServer_properties_typeProperties_host": {
+			"value": "C:\\Users\\admin25\\Documents\\files"
+		},
+		"FileServer_properties_typeProperties_userId": {
+			"value": "admin25"
+		}
+	}
+}
