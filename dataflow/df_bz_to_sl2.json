@@ -1,0 +1,473 @@
+{
+	"name": "df_bz_to_sl2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "OnlineTransactions"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "InStoreTransactions"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "CustomerServiceInteractions"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LoyalityAccounts"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LoyalityTransactions"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink4"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink5"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink6"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink8"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink9"
+				},
+				{
+					"linkedService": {
+						"referenceName": "synapse-vam-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink10"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink11"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "split3"
+				},
+				{
+					"name": "aggregate3"
+				},
+				{
+					"name": "split4"
+				},
+				{
+					"name": "aggregate4"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "split5"
+				},
+				{
+					"name": "aggregate5"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "split6"
+				},
+				{
+					"name": "aggregate6"
+				},
+				{
+					"name": "alterRow3"
+				},
+				{
+					"name": "alterRow4"
+				},
+				{
+					"name": "alterRow5"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          OrderID as integer,",
+				"          CustomerID as integer,",
+				"          ProductID as integer,",
+				"          DateTime as timestamp,",
+				"          PaymentMethod as string,",
+				"          Amount as double,",
+				"          Status as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/bronze',",
+				"     fileName: 'OnlineTransactions.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> OnlineTransactions",
+				"source(output(",
+				"          TransactionID as integer,",
+				"          CustomerID as integer,",
+				"          StoreID as integer,",
+				"          DateTime as timestamp,",
+				"          Amount as double,",
+				"          PaymentMethod as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/bronze',",
+				"     fileName: 'InStoreTransactions.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> InStoreTransactions",
+				"source(output(",
+				"          InteractionID as integer,",
+				"          CustomerID as integer,",
+				"          DateTime as timestamp,",
+				"          AgentID as integer,",
+				"          IssueType as string,",
+				"          ResolutionStatus as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/bronze',",
+				"     fileName: 'CustomerServiceInteractions.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> CustomerServiceInteractions",
+				"source(output(",
+				"          LoyaltyID as integer,",
+				"          CustomerID as integer,",
+				"          PointsEarned as integer,",
+				"          TierLevel as string,",
+				"          JoinDate as date",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/bronze',",
+				"     fileName: 'LoyaltyAccounts.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> LoyalityAccounts",
+				"source(output(",
+				"          LoyaltyID as integer,",
+				"          DateTime as timestamp,",
+				"          PointsChange as integer,",
+				"          Reason as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/bronze',",
+				"     fileName: 'LoyaltyTransactions.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> LoyalityTransactions",
+				"OnlineTransactions split(!isNull(OrderID) && !isNull(CustomerID) && !isNull(ProductID),",
+				"     disjoint: false) ~> split1@(Notnull, null)",
+				"split1@Notnull aggregate(groupBy(OrderID,",
+				"          CustomerID,",
+				"          ProductID),",
+				"     each(match(name!=\"OrderID\"&&name!=\"CustomerID\"&&name!=\"ProductID\"), $$ = first($$))) ~> aggregate1",
+				"InStoreTransactions split(!isNull(TransactionID) && !isNull(CustomerID) && !isNull(StoreID),",
+				"     disjoint: false) ~> split3@(Notnulls, nulls)",
+				"split3@Notnulls aggregate(groupBy(TransactionID,",
+				"          CustomerID),",
+				"     each(match(name!=\"TransactionID\"&&name!=\"CustomerID\"), $$ = first($$))) ~> aggregate3",
+				"CustomerServiceInteractions split(!isNull(InteractionID) && !isNull(CustomerID),",
+				"     disjoint: false) ~> split4@(Notnulls, nulls)",
+				"split4@Notnulls aggregate(groupBy(InteractionID),",
+				"     each(match(name!=\"InteractionID\"), $$ = first($$))) ~> aggregate4",
+				"aggregate4 alterRow(upsertIf(1==1)) ~> alterRow1",
+				"LoyalityAccounts split(!isNull(LoyaltyID) && !isNull(CustomerID),",
+				"     disjoint: false) ~> split5@(Notnull, null)",
+				"split5@Notnull aggregate(groupBy(LoyaltyID),",
+				"     each(match(name!=\"LoyaltyID\"), $$ = first($$))) ~> aggregate5",
+				"aggregate5 alterRow(upsertIf(1==1)) ~> alterRow2",
+				"LoyalityTransactions split(!isNull(LoyaltyID),",
+				"     disjoint: false) ~> split6@(Notnulls, null)",
+				"split6@Notnulls aggregate(groupBy(LoyaltyID),",
+				"     each(match(name!=\"LoyaltyID\"), $$ = first($$))) ~> aggregate6",
+				"aggregate6 alterRow(upsertIf(1==1)) ~> alterRow3",
+				"aggregate3 alterRow(upsertIf(1==1)) ~> alterRow4",
+				"aggregate1 alterRow(upsertIf(1==1)) ~> alterRow5",
+				"alterRow5 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'OnlineTransactions',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['OrderID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          OrderID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          DateTime,",
+				"          PaymentMethod,",
+				"          Amount,",
+				"          Status",
+				"     )) ~> sink1",
+				"split1@null sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/nulls',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          OrderID,",
+				"          CustomerID,",
+				"          ProductID,",
+				"          DateTime,",
+				"          PaymentMethod,",
+				"          Amount,",
+				"          Status",
+				"     )) ~> sink2",
+				"alterRow4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'InStoreTransactions',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['TransactionID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          TransactionID,",
+				"          CustomerID,",
+				"          StoreID,",
+				"          DateTime,",
+				"          Amount,",
+				"          PaymentMethod",
+				"     )) ~> sink4",
+				"split3@nulls sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/nulls',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink5",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'CustomerServiceInteractions',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['InteractionID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          InteractionID,",
+				"          CustomerID,",
+				"          DateTime,",
+				"          AgentID,",
+				"          IssueType,",
+				"          ResolutionStatus",
+				"     )) ~> sink6",
+				"split4@nulls sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/nulls',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          InteractionID,",
+				"          CustomerID,",
+				"          DateTime,",
+				"          AgentID,",
+				"          IssueType,",
+				"          ResolutionStatus",
+				"     )) ~> sink8",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'LoyaltyAccounts',",
+				"     insertable: false,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: true,",
+				"     keys:['LoyaltyID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          LoyaltyID,",
+				"          CustomerID,",
+				"          PointsEarned,",
+				"          TierLevel,",
+				"          JoinDate",
+				"     )) ~> sink9",
+				"split5@null sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     folderPath: 'project03/nulls',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          LoyaltyID,",
+				"          CustomerID,",
+				"          PointsEarned,",
+				"          TierLevel,",
+				"          JoinDate",
+				"     )) ~> sink10",
+				"alterRow3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'LoyaltyTransactions',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['LoyaltyID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          LoyaltyID,",
+				"          DateTime,",
+				"          PointsChange,",
+				"          Reason",
+				"     )) ~> sink11"
+			]
+		}
+	}
+}
