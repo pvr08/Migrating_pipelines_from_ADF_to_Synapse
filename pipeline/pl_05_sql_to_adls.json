@@ -50,34 +50,8 @@
 										"fileExtension": "csv"
 									}
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "AzureSqlTable05",
-									"type": "DatasetReference",
-									"parameters": {
-										"TableName": {
-											"value": "@item()",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "TrgtDelimitedText",
-									"type": "DatasetReference"
-								}
-							]
+								"enableStaging": false
+							}
 						}
 					]
 				}
