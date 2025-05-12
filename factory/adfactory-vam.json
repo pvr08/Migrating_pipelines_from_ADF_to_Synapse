@@ -1,0 +1,9 @@
+{
+	"name": "adfactory-vam",
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "b3436fc4-934e-47f2-b830-488b38522127",
+		"tenantId": "2dfe05fa-e532-47e7-95c8-56f0f4f444c8"
+	}
+}

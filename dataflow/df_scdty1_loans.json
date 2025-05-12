@@ -1,0 +1,187 @@
+{
+	"name": "df_scdty1_loans",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "AzureDataLakeStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "loans"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "loanstable"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "InsertSink"
+				},
+				{
+					"linkedService": {
+						"referenceName": "AzureSqlDatabase",
+						"type": "LinkedServiceReference"
+					},
+					"name": "UpdateSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select"
+				},
+				{
+					"name": "AddHashkey"
+				},
+				{
+					"name": "lookup"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "AuditCol1"
+				},
+				{
+					"name": "alterRow"
+				},
+				{
+					"name": "AuditCol"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          loan_id as integer,",
+				"          customer_id as integer,",
+				"          loan_amount as double,",
+				"          interest_rate as double,",
+				"          loan_term as integer",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'data',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['silver_layer/loans/*.csv']) ~> loans",
+				"source(output(",
+				"          LOAN_ID as integer,",
+				"          HASHKEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'query',",
+				"     store: 'sqlserver',",
+				"     query: 'select LOAN_ID, HASHKEY from LOAN_SCDTYPE1',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> loanstable",
+				"loans select(mapColumn(",
+				"          each(match(1==1),",
+				"               concat('src_',$$) = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select",
+				"select derive(src_HashKey = crc32(concat(toString(src_loan_id),toString(src_customer_id),toString(src_loan_amount),toString(src_interest_rate),toString(src_loan_term)))) ~> AddHashkey",
+				"AddHashkey, loanstable lookup(src_loan_id == LOAN_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup",
+				"lookup split(!isNull(src_loan_id) && isNull(LOAN_ID),",
+				"     src_loan_id==LOAN_ID && src_HashKey!=toLong(HASHKEY),",
+				"     disjoint: false) ~> split1@(INSERT, UPDATE)",
+				"split1@UPDATE derive(src_updatedby = 'dataflow-updated',",
+				"          src_updateddate = currentTimestamp()) ~> AuditCol1",
+				"AuditCol1 alterRow(updateIf(1==1)) ~> alterRow",
+				"split1@INSERT derive(src_createdby = 'dataflow',",
+				"          src_createddate = currentTimestamp(),",
+				"          src_updatedby = 'dataflow',",
+				"          src_updateddate = currentTimestamp()) ~> AuditCol",
+				"AuditCol sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOAN_ID as integer,",
+				"          CUSTOMER_ID as integer,",
+				"          LOAN_AMOUNT as decimal(18,2),",
+				"          INTEREST_RATE as decimal(5,2),",
+				"          LOAN_TERM as integer,",
+				"          HASHKEY as string,",
+				"          CREATED_BY as string,",
+				"          CREATE_DATE as timestamp,",
+				"          UPDATED_BY as string,",
+				"          UPDATE_DATE as timestamp",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'LOAN_SCDTYPE1',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          LOAN_ID = src_loan_id,",
+				"          CUSTOMER_ID = src_customer_id,",
+				"          LOAN_AMOUNT = src_loan_amount,",
+				"          INTEREST_RATE = src_interest_rate,",
+				"          LOAN_TERM = src_loan_term,",
+				"          HASHKEY = src_HashKey,",
+				"          CREATED_BY = src_createdby,",
+				"          CREATE_DATE = src_createddate,",
+				"          UPDATED_BY = src_updatedby,",
+				"          UPDATE_DATE = src_updateddate",
+				"     )) ~> InsertSink",
+				"alterRow sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOAN_ID as integer,",
+				"          CUSTOMER_ID as integer,",
+				"          LOAN_AMOUNT as decimal(18,2),",
+				"          INTEREST_RATE as decimal(5,2),",
+				"          LOAN_TERM as integer,",
+				"          HASHKEY as string,",
+				"          CREATED_BY as string,",
+				"          CREATE_DATE as timestamp,",
+				"          UPDATED_BY as string,",
+				"          UPDATE_DATE as timestamp",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'LOAN_SCDTYPE1',",
+				"     insertable: false,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['LOAN_ID'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          LOAN_ID = src_loan_id,",
+				"          CUSTOMER_ID = src_customer_id,",
+				"          LOAN_AMOUNT = src_loan_amount,",
+				"          INTEREST_RATE = src_interest_rate,",
+				"          LOAN_TERM = src_loan_term,",
+				"          UPDATED_BY = src_updatedby,",
+				"          UPDATE_DATE = src_updateddate,",
+				"          HASHKEY = src_HashKey",
+				"     )) ~> UpdateSink"
+			]
+		}
+	}
+}
