@@ -181,6 +181,69 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_cleandata_bz_to_silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_cleandata_bz_to_sl",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_cleandata_bz_to_sl1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Accounts": {},
+									"Customers": {},
+									"LoanPayments": {},
+									"loans": {},
+									"transactions": {},
+									"AcctSink": {},
+									"AcctNulls": {},
+									"CustSink": {},
+									"CustNulls": {},
+									"LoanPymtSink": {},
+									"LoanPymtNulls": {},
+									"LoanSink": {},
+									"LoanNulls": {},
+									"TransactionSink": {},
+									"TransNulls": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "None",
+							"cacheSinks": {
+								"firstRowOnly": true
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-21T06:27:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_cleandata_bz_to_sl1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable051')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -384,7 +447,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_cleandata_bz_to_sl')]",
+			"name": "[concat(parameters('factoryName'), '/df_cleandata_bz_to_sl1')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
